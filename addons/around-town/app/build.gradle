@@ -1,0 +1,22 @@
+plugins { id 'com.android.application' }
+
+def envFile = file('../../../.env.local')
+def keyLine = envFile.exists() ? envFile.readLines().find { it.startsWith('OPENWEATHER_API_KEY=') } : null
+def weatherKey = keyLine == null ? '' : keyLine.substring('OPENWEATHER_API_KEY='.length()).trim()
+if (!weatherKey.matches('[A-Za-z0-9]+')) throw new GradleException('OPENWEATHER_API_KEY missing or invalid in ignored root .env.local')
+
+android {
+    namespace 'com.jayhilwig.aroundtown'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'com.jayhilwig.aroundtown'
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName '0.1'
+        buildConfigField 'String', 'OPENWEATHER_KEY', '"' + weatherKey + '"'
+    }
+    buildFeatures { buildConfig true }
+    buildTypes { release { minifyEnabled true; shrinkResources true; signingConfig signingConfigs.debug } }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}
